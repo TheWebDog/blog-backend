@@ -26,12 +26,8 @@
   }],
   "rewrites": [
     {
-      "source": "/page",
-      "destination": "/routers/pageRouter.js"
-    },
-    {
-      "source": "/user",
-      "destination": "/routers/userRouter.js"
+      "source": "/",
+      "destination": "/api/json"
     }
   ]
 }
