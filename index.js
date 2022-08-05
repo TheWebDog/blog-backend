@@ -2,8 +2,8 @@ const express = require('express');
 const app = express();
 
 // 解决跨域问题
-// const cors = require('cors')
-// app.use(cors())
+const cors = require('cors')
+app.use(cors())
 
 // 解析post请求发来的数据
 app.use(express.urlencoded({extended:false}))
