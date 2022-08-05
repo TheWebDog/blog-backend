@@ -47,7 +47,8 @@ router.post('/submitMavonPic', function (req, res) {
 
 // 接收文章
 router.post('/submitPage', function (req, res) {
-  ;(async () => {
+  ; (async () => {
+    // console.log(req)
     // new一个Form类 并写入存放路径uploadDir
     var form_pic = new multiparty.Form({ uploadDir: './public/images' })
     // 对数据进行处理
@@ -96,7 +97,7 @@ router.post('/submitPage', function (req, res) {
           thepage.save(function (err, result) {
             // 文章存入mongoose
             if (err) {
-              // console.log(err, '-----------err')
+              console.log(err, '-----------err')
               res.send('失败')
             } else {
               // console.log(result, '-----------res')

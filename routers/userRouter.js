@@ -4,6 +4,8 @@ const fsPromises = require('fs').promises
 const async = require('async')
 const UserModel = require('../models/user')
 
+// const bcrypt = require('bcrypt') 用于给用户加密 密码变为哈希值
+
 // 录入用户函数
 var informationEntry = async function (name, password) {
   var now = new Date()
