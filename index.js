@@ -18,19 +18,19 @@ const app = express();
 // app.use(cors())
 
 // 网易云项目抄来的
-app.set('trust proxy', true)
-app.use((req, res, next) => {
-  if (req.path !== '/' && !req.path.includes('.')) {
-    res.set({
-      'Access-Control-Allow-Credentials': true,
-      'Access-Control-Allow-Origin': req.headers.origin || '*',
-      'Access-Control-Allow-Headers': 'X-Requested-With,Content-Type',
-      'Access-Control-Allow-Methods': 'PUT,POST,GET,DELETE,OPTIONS',
-      'Content-Type': 'application/json; charset=utf-8',
-    })
-  }
-  req.method === 'OPTIONS' ? res.status(204).end() : next()
-})
+// app.set('trust proxy', true)
+// app.use((req, res, next) => {
+//   if (req.path !== '/' && !req.path.includes('.')) {
+//     res.set({
+//       'Access-Control-Allow-Credentials': true,
+//       'Access-Control-Allow-Origin': req.headers.origin || '*',
+//       'Access-Control-Allow-Headers': 'X-Requested-With,Content-Type',
+//       'Access-Control-Allow-Methods': 'PUT,POST,GET,DELETE,OPTIONS',
+//       'Content-Type': 'application/json; charset=utf-8',
+//     })
+//   }
+//   req.method === 'OPTIONS' ? res.status(204).end() : next()
+// })
 
 
 // 解析post请求发来的数据
@@ -42,7 +42,7 @@ app.get('/', (req, res) => {
 })
 
 // // 分路由
-// app.use('/page', require('./routers/pageRouter'))
-// app.use('/user', require('./routers/userRouter'))
+app.use('/page', require('./routers/pageRouter'))
+app.use('/user', require('./routers/userRouter'))
 
 app.listen(6060)
