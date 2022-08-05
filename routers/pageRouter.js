@@ -21,10 +21,11 @@ router.get('/test', (req, res) => {
 // md文章图片获取
 // 格式要求：res.send(`https://${req.headers.host}/page/getPic?picUrl=${XXX}`)
 router.get('/getPic', function (req, res) {
-  console.log('/page/getPic')
+  // console.log('/page/getPic')
   var { picUrl } = req.query
   // console.log(picUrl)
-  res.sendFile(path.resolve(`./${picUrl}`))
+  // res.sendFile(path.resolve(`./${picUrl}`))
+  res.send('page/getPic链接成功')
 })
 
 // md文章图片删除
