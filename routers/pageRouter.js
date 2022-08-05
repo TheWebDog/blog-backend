@@ -12,6 +12,11 @@ const multiparty = require('multiparty') // 处理fromdata图片的中间件
 
 // 接口--------------------------------------------------------------------------------
 
+// 测试接口
+router.get('/test', (req, res) => {
+  res.send('page/test链接成功')
+})
+
 // 图片
 // md文章图片获取
 // 格式要求：res.send(`http://${req.headers.host}/page/getPic?picUrl=${XXX}`)
