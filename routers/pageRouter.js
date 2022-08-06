@@ -20,6 +20,7 @@ router.get('/test', (req, res) => {
 
 // 图片
 // md文章图片获取
+// 格式：https://blog-backend-maoagmycv-thewebdog.vercel.app/page/getPic/homePage2.gif
 router.get('/getPic/:pic', function (req, res) {
   // var { picUrl } = req.query、
   var getPic =req.params.pic
@@ -83,9 +84,9 @@ router.post('/submitMavonPic', function (req, res) {
       console.log('submitMavonPic时err了')
       res.send('submitMavonPic时err了')
     } else {
-      // var pic_path = files.mavon_editor_pic[0].path
-      // var requirePath = `http://${req.headers.host}/page/getPic?picUrl=${pic_path}`
-      // res.send({ requirePath, pic_path })
+      var pic_path = files.mavon_editor_pic[0].path
+      var requirePath = `https://${req.headers.host}/page/getPic/${pic_path}`
+      res.send({ requirePath, pic_path })
     }
   })
 })
@@ -125,7 +126,7 @@ router.post('/submitPage', function (req, res) {
           var pic_path = files.pic[0].path
           mdPic[0].length == 0 ? (mdPic = []) : mdPic
           mdPic.push(pic_path)
-          var coverRequirePath = `http://${req.headers.host}/page/getPic?picUrl=${pic_path}`
+          var coverRequirePath = `https://${req.headers.host}/page/getPic/${pic_path}`
           var now = new Date()
           var day = now.getDate()
           var month = now.getMonth() + 1
@@ -186,7 +187,7 @@ router.post('/savePage', function (req, res) {
         mdPic == [''] ? (mdPic = []) : mdPic
         pic_path ? mdPic.push(pic_path) : (mdPic = null)
         var coverRequirePath = pic_path
-          ? `https://${req.headers.host}/page/getPic?picUrl=${pic_path}`
+          ? `https://${req.headers.host}/page/getPic/${pic_path}`
           : null
 
         const savePage = new SavePageModel({
