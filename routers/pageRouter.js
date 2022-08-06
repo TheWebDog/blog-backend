@@ -82,7 +82,7 @@ router.post('/submitMavonPic', function (req, res) {
   var form_pic = new multiparty.Form({ uploadDir: path.resolve('./public/images') })
   form_pic.parse(req, async (err, fields, files) => {
     if (err) {
-      console.log('submitMavonPic时err了')
+      console.log('submitMavonPic时err了',err)
       res.send('submitMavonPic时err了')
     } else {
       var pic_path = files.mavon_editor_pic[0].path
@@ -109,7 +109,7 @@ router.post('/submitPage', function (req, res) {
     form_pic.parse(req, async (err, fields, files) => {
       if (err) {
         // 数据处理错误
-        console.log('submitPage时err了')
+        console.log('submitPage时err了',err)
         res.send('submitPage时err了')
       } else {
         // 数据取出
@@ -175,7 +175,7 @@ router.post('/savePage', function (req, res) {
     var form_pic = new multiparty.Form({ uploadDir: path.resolve('./public/images') })
     form_pic.parse(req, async (err, fields, files) => {
       if (err) {
-        console.log('savePage时err了')
+        console.log('savePage时err了',err)
         res.send('savePage时err了')
       } else {
         var { title, category, synopsis, md, mdPic } = fields
