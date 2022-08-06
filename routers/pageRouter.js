@@ -29,7 +29,7 @@ router.get('/getPic', function (req, res) {
   // res.writeHead(200, { "Content-Type": "image/gif" });      
   // res.end("Hello, World!");  
 
-  fs.readFile('../public/homePage2.gif', { encoding: 'utf-8' }, (err, data) => {
+  fs.readFile('./public/homePage2.gif', { encoding: 'utf-8' }, (err, data) => {
     if (err) {
         console.log(err)
         res.writeHead(500, { 'Content-Type': 'text/plain;charset=utf-8' })
