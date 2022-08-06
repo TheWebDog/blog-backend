@@ -31,9 +31,10 @@ router.get('/getPic', function (req, res) {
 
   fs.readFile('./public/homePage2.gif', { encoding: 'utf-8' }, (err, data) => {
     if (err) {
+      var theErr = 'err'+err
         console.log(err)
         res.writeHead(500, { 'Content-Type': 'text/plain;charset=utf-8' })
-        res.write(err)
+        res.write(theErr)
         res.end()
         return
     } else {
