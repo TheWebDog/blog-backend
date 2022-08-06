@@ -46,7 +46,7 @@ router.post('/submitMavonPic', function (req, res) {
       res.send('submitMavonPic时err了')
     } else {
       var pic_path = files.mavon_editor_pic[0].path
-      var requirePath = `https://${req.headers.host}/page/getPic?picUrl=${pic_path}`
+      var requirePath = `http://${req.headers.host}/page/getPic?picUrl=${pic_path}`
       res.send({ requirePath, pic_path })
     }
   })
@@ -80,7 +80,7 @@ router.post('/submitPage', function (req, res) {
           var pic_path = files.pic[0].path
           mdPic[0].length == 0 ? (mdPic = []) : mdPic
           mdPic.push(pic_path)
-          var coverRequirePath = `https://${req.headers.host}/page/getPic?picUrl=${pic_path}`
+          var coverRequirePath = `http://${req.headers.host}/page/getPic?picUrl=${pic_path}`
           var now = new Date()
           var day = now.getDate()
           var month = now.getMonth() + 1
