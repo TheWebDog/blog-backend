@@ -19,17 +19,13 @@ router.get('/test', (req, res) => {
 
 // 图片
 // md文章图片获取
-// 格式要求：res.send(`https://${req.headers.host}/page/getPic?picUrl=${XXX}`)
 router.get('/getPic', function (req, res) {
-  // console.log('/page/getPic')
   var { picUrl } = req.query
-  // console.log(picUrl)
   res.sendFile(path.resolve(`./${picUrl}`))
   // res.send(picUrl)
 })
 
 // md文章图片删除
-// 格式要求：res.send(`https://${req.headers.host}/page/removePic?picUrl=${XXX}`)
 router.get('/removePic', function (req, res) {
   var { picUrl } = req.query
   fsPromises.unlink(`./${picUrl}`)
@@ -45,12 +41,19 @@ router.post('/submitMavonPic', function (req, res) {
       console.log('submitMavonPic时err了')
       res.send('submitMavonPic时err了')
     } else {
-      var pic_path = files.mavon_editor_pic[0].path
-      var requirePath = `http://${req.headers.host}/page/getPic?picUrl=${pic_path}`
-      res.send({ requirePath, pic_path })
+      // var pic_path = files.mavon_editor_pic[0].path
+      // var requirePath = `http://${req.headers.host}/page/getPic?picUrl=${pic_path}`
+      // res.send({ requirePath, pic_path })
     }
   })
 })
+
+
+
+
+
+
+
 
 // 接收文章
 router.post('/submitPage', function (req, res) {
