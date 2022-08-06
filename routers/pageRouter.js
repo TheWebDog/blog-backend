@@ -23,26 +23,36 @@ router.get('/test', (req, res) => {
 router.get('/getPic', function (req, res) {
   var { picUrl } = req.query
 
-  // res.sendFile(path.resolve(`./${picUrl}`))
+  res.sendFile(path.resolve(`./public/homePage2.gif`), function (err) {
+    if (err) {
+      var theErr = 'err'+err
+      console.log(err)
+      res.writeHead(500, { 'Content-Type': 'text/plain;charset=utf-8' })
+      res.write(theErr)
+      res.end()
+    }
+  })
+
+
   // res.send(picUrl)
 
   // res.writeHead(200, { "Content-Type": "image/gif" });      
   // res.end("Hello, World!");  
 
-  fs.readFile(path.resolve(`./public/homePage2.gif`), { encoding: 'utf-8' }, (err, data) => {
-    if (err) {
-      var theErr = 'err'+err
-        console.log(err)
-        res.writeHead(500, { 'Content-Type': 'text/plain;charset=utf-8' })
-        res.write(theErr)
-        res.end()
-        return
-    } else {
-        res.writeHead(200, { 'Content-Type': 'image/gif' })
-        res.write(data)
-        res.end()
-    }
-})
+//   fs.readFile(path.resolve(`./public/homePage2.gif`), { encoding: 'utf-8' }, (err, data) => {
+//     if (err) {
+//       var theErr = 'err'+err
+//         console.log(err)
+//         res.writeHead(500, { 'Content-Type': 'text/plain;charset=utf-8' })
+//         res.write(theErr)
+//         res.end()
+//         return
+//     } else {
+//         res.writeHead(200, { 'Content-Type': 'image/gif' })
+//         res.write(data)
+//         res.end()
+//     }
+// })
   
 })
 
