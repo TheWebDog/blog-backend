@@ -33,7 +33,7 @@ router.get('/getPic', function (req, res) {
     if (err) {
         console.log(err)
         res.writeHead(500, { 'Content-Type': 'text/plain;charset=utf-8' })
-        res.write('图片被吞了(；´д｀)ゞ')
+        res.write(err)
         res.end()
         return
     } else {
