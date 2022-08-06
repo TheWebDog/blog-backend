@@ -21,8 +21,13 @@ router.get('/test', (req, res) => {
 // md文章图片获取
 router.get('/getPic', function (req, res) {
   var { picUrl } = req.query
-  res.sendFile(path.resolve(`./${picUrl}`))
+  
+  // res.sendFile(path.resolve(`./${picUrl}`))
   // res.send(picUrl)
+
+  res.writeHead(200, { "Content-Type": "text/plain" });      
+  res.end("Hello, World!");  
+  
 })
 
 // md文章图片删除
