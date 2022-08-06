@@ -1,8 +1,8 @@
 const express = require('express');
 const server = express();
 
-
-
+// const cros = require('cors')
+// server.use(cros)
 
 
 // 解析post请求发来的数据
