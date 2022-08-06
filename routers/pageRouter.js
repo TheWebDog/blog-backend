@@ -25,7 +25,7 @@ router.get('/getPic', function (req, res) {
   var { picUrl } = req.query
   // console.log(picUrl)
   // res.sendFile(path.resolve(`./${picUrl}`))
-  res.send('picUrl',picUrl,'req',req)
+  res.send(picUrl)
 })
 
 // md文章图片删除
