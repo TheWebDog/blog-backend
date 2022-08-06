@@ -1,5 +1,6 @@
 const express = require('express')
 const router = express.Router()
+const fs = require('fs')
 const fsPromises = require('fs').promises
 const async = require('async')
 const PageModel = require('../models/page')
@@ -21,12 +22,26 @@ router.get('/test', (req, res) => {
 // md文章图片获取
 router.get('/getPic', function (req, res) {
   var { picUrl } = req.query
-  
+
   // res.sendFile(path.resolve(`./${picUrl}`))
   // res.send(picUrl)
 
-  res.writeHead(200, { "Content-Type": "text/plain" });      
-  res.end("Hello, World!");  
+  // res.writeHead(200, { "Content-Type": "image/gif" });      
+  // res.end("Hello, World!");  
+
+  fs.readFile('../public/homePage2.gif', { encoding: 'utf-8' }, (err, data) => {
+    if (err) {
+        console.log(err)
+        res.writeHead(500, { 'Content-Type': 'text/plain;charset=utf-8' })
+        res.write('图片被吞了(；´д｀)ゞ')
+        res.end()
+        return
+    } else {
+        res.writeHead(200, { 'Content-Type': 'image/gif' })
+        res.write(data)
+        res.end()
+    }
+})
   
 })
 
