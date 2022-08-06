@@ -20,10 +20,21 @@ router.get('/test', (req, res) => {
 
 // 图片
 // md文章图片获取
-router.get('/getPic', function (req, res) {
-  var { picUrl } = req.query
+router.get('/getPic/:pic', function (req, res) {
+  // var { picUrl } = req.query、
+  var getPic =req.params.pic
 
-  res.sendFile(path.resolve(`./public/homePage2.gif`), function (err) {
+  // res.sendFile(path.resolve(`./public/homePage2.gif`), function (err) {
+  //   if (err) {
+  //     var theErr = 'err'+err
+  //     console.log(err)
+  //     res.writeHead(500, { 'Content-Type': 'text/plain;charset=utf-8' })
+  //     res.write(theErr)
+  //     res.end()
+  //   }
+  // })
+
+  res.sendFile(path.resolve(`./public/${getPic}`), function (err) {
     if (err) {
       var theErr = 'err'+err
       console.log(err)
