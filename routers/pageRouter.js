@@ -6,6 +6,7 @@ const async = require('async')
 const PageModel = require('../models/page')
 const SavePageModel = require('../models/savePage')
 const UserCommentModel = require('../models/comment')
+const imgModel = require('../models/imgModel')
 const pinyinPro = require('pinyin-pro').pinyin
 const path = require('path')
 
@@ -87,8 +88,29 @@ router.post('/submitMavonPic', function (req, res) {
       res.send('submitMavonPic时err了')
     } else {
       var pic_path = files.mavon_editor_pic[0].path
-      var requirePath = `https://${req.headers.host}/page/getPic/${pic_path}`
-      res.send({ requirePath, pic_path })
+
+      // var requirePath = `https://${req.headers.host}/page/getPic/${pic_path}`
+      // res.send({ requirePath, pic_path })
+
+      var img = new imgModel
+      img.img.data = fs.readFileSync(pic_path);
+      img.img.contentType = 'image/png';
+      img.save(function (error, a) {
+        if (error) {
+          console.log(error)
+        } else {
+          imgModel.findById(a, function (err, doc) {
+            if (err) {
+              console.log(err)
+            } else {
+              console.log(doc.img)
+              res.contentType(doc.img.contentType);
+              res.send(doc.img.data);
+            }
+          });
+        }
+      })
+
     }
   })
 })
