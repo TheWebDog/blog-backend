@@ -79,7 +79,8 @@ router.get('/removePic', function (req, res) {
 router.post('/submitMavonPic', function (req, res) {
   // 对图片的处理
   // var form_pic = new multiparty.Form({ uploadDir: './public/images' }) 修改了
-  var form_pic = new multiparty.Form({ uploadDir: path.resolve('./public/images') })
+  // var form_pic = new multiparty.Form({ uploadDir: path.resolve('./public/images') })
+  var form_pic = new multiparty.Form()
   form_pic.parse(req, async (err, fields, files) => {
     if (err) {
       console.log('submitMavonPic时err了',err)
@@ -104,7 +105,8 @@ router.post('/submitPage', function (req, res) {
   ; (async () => {
     // console.log(req)
     // new一个Form类 并写入存放路径uploadDir
-    var form_pic = new multiparty.Form({ uploadDir: path.resolve('./public/images') })
+    // var form_pic = new multiparty.Form({ uploadDir: path.resolve('./public/images') })
+    var form_pic = new multiparty.Form()
     // 对数据进行处理
     form_pic.parse(req, async (err, fields, files) => {
       if (err) {
@@ -172,7 +174,8 @@ router.post('/submitPage', function (req, res) {
 // 保存草稿
 router.post('/savePage', function (req, res) {
   ;(async () => {
-    var form_pic = new multiparty.Form({ uploadDir: path.resolve('./public/images') })
+    // var form_pic = new multiparty.Form({ uploadDir: path.resolve('./public/images') })
+    var form_pic = new multiparty.Form()
     form_pic.parse(req, async (err, fields, files) => {
       if (err) {
         console.log('savePage时err了',err)
