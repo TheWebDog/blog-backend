@@ -105,11 +105,12 @@ router.post('/submitMavonPic', function (req, res) {
             } else {
               console.log(doc.img)
               res.contentType(doc.img.contentType);
-              res.send(doc.img.data);
+              res.send(doc.img);
             }
           });
         }
       })
+
 
     }
   })
