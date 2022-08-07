@@ -20,13 +20,11 @@ router.get('/test', (req, res) => {
 })
 
 // 图片
-// md文章图片获取
+// 获取图片base64数据
 // 格式：https://blog-backend-maoagmycv-thewebdog.vercel.app/page/getPic/homePage2.gif
 router.get('/getPic/:pic', function (req, res) {
-  // var { picUrl } = req.query、
-  var getPic =req.params.pic
-
-  // res.sendFile(path.resolve(`./public/homePage2.gif`), function (err) {
+  // var getPic =req.params.pic
+  // res.sendFile(path.resolve(`./public/${getPic}`), function (err) {
   //   if (err) {
   //     var theErr = 'err'+err
   //     console.log(err)
@@ -36,44 +34,39 @@ router.get('/getPic/:pic', function (req, res) {
   //   }
   // })
 
-  res.sendFile(path.resolve(`./public/${getPic}`), function (err) {
+  var picId = req.params.pic
+  
+  imgModel.findById(picId, function (err, doc) {
     if (err) {
-      var theErr = 'err'+err
       console.log(err)
-      res.writeHead(500, { 'Content-Type': 'text/plain;charset=utf-8' })
-      res.write(theErr)
-      res.end()
+    } else {
+      console.log(doc.img.data.toString('base64'))
+      // res.contentType(doc.img.contentType);
+      res.send('data:image/png;base64,' + doc.img.data.toString('base64'));
+
     }
-  })
-
-
-  // res.send(picUrl)
-
-  // res.writeHead(200, { "Content-Type": "image/gif" });      
-  // res.end("Hello, World!");  
-
-//   fs.readFile(path.resolve(`./public/homePage2.gif`), { encoding: 'utf-8' }, (err, data) => {
-//     if (err) {
-//       var theErr = 'err'+err
-//         console.log(err)
-//         res.writeHead(500, { 'Content-Type': 'text/plain;charset=utf-8' })
-//         res.write(theErr)
-//         res.end()
-//         return
-//     } else {
-//         res.writeHead(200, { 'Content-Type': 'image/gif' })
-//         res.write(data)
-//         res.end()
-//     }
-// })
+  });
   
 })
 
 // md文章图片删除
-router.get('/removePic', function (req, res) {
-  var { picUrl } = req.query
-  fsPromises.unlink(`./${picUrl}`)
-  res.send('removed')
+router.get('/removePic/:pic', function (req, res) {
+  var picId = req.params.pic
+  imgModel.findById(picId, function (err, doc) {
+    if (err) {
+      console.log(err)
+      res.send({'err':err})
+    } else {
+      imgModel.deleteOne(picId, function (error, resault) {
+        if (err) {
+          console.log(error)
+          res.send({'error':error})
+        } else {
+          res.send('removed')
+        }
+      })
+    }
+  });
 })
 
 // md文章图片增添
@@ -99,19 +92,10 @@ router.post('/submitMavonPic', function (req, res) {
         if (error) {
           console.log(error)
         } else {
-          imgModel.findById(a, function (err, doc) {
-            if (err) {
-              console.log(err)
-            } else {
-              console.log(doc.img)
-              res.contentType(doc.img.contentType);
-              res.send(doc.img);
-            }
-          });
+          var requirePath = `https://${req.headers.host}/page/getPic/${a._id}`
+          res.send(requirePath)
         }
       })
-
-
     }
   })
 })
@@ -129,15 +113,32 @@ router.post('/submitPage', function (req, res) {
     // console.log(req)
     // new一个Form类 并写入存放路径uploadDir
     // var form_pic = new multiparty.Form({ uploadDir: path.resolve('./public/images') })
+
+
     var form_pic = new multiparty.Form()
     // 对数据进行处理
+    var picId
+    var requirePath
     form_pic.parse(req, async (err, fields, files) => {
       if (err) {
         // 数据处理错误
         console.log('submitPage时err了',err)
         res.send('submitPage时err了')
       } else {
-        // 数据取出
+        // 处理封面图片
+        var pic_path = files.pic[0].path
+        var img = new imgModel
+        img.img.data = fs.readFileSync(pic_path);
+        img.img.contentType = 'image/png';
+        img.save(function (error, a) {
+          if (error) {
+            console.log(error)
+          } else {
+            picId=a._id
+            requirePath = `https://${req.headers.host}/page/getPic/${a._id}`
+
+
+                    // 数据取出
         var { title, category, synopsis, md, html, mdPic } = fields
         // 我去太奶奶的 竟然都是数组 就那么一项 给我整数组嘎哈 靠靠靠靠靠 mlgbz的
         var title = title[0]
@@ -149,10 +150,9 @@ router.post('/submitPage', function (req, res) {
           var synopsis = synopsis[0]
           var md = md[0]
           var html = html[0]
-          var pic_path = files.pic[0].path
           mdPic[0].length == 0 ? (mdPic = []) : mdPic
-          mdPic.push(pic_path)
-          var coverRequirePath = `https://${req.headers.host}/page/getPic/${pic_path}`
+          mdPic.push(picId)
+          var coverRequirePath = requirePath
           var now = new Date()
           var day = now.getDate()
           var month = now.getMonth() + 1
@@ -185,16 +185,37 @@ router.post('/submitPage', function (req, res) {
           })
         } else {
           // 重名 删除本次存放的图片 并返回结果提示
-          var pic_path = files.pic[0].path
-          fsPromises.unlink(pic_path)
-          res.send('文章标题重复，请修改')
-        }
+          imgModel.findById(picId, function (err, doc) {
+            if (err) {
+              console.log(err)
+              res.send({'err':err})
+            } else {
+              imgModel.deleteOne(picId, function (error, resault) {
+                if (err) {
+                  console.log(error)
+                  res.send({'error':error})
+                } else {
+                  res.send('文章标题重复，请修改')
+                }
+              })
+            }
+          });
+            }
+            
+
+
+          }
+        })
+
+
+
+
       }
     })
   })().catch((e) => console.error(e, 'err'))
 })
 
-// 保存草稿
+// 保存草稿 待完善
 router.post('/savePage', function (req, res) {
   ;(async () => {
     // var form_pic = new multiparty.Form({ uploadDir: path.resolve('./public/images') })
@@ -315,14 +336,25 @@ router.post('/removeArticle', function (req, res) {
     if (findresault.length == 0) {
       res.send('文章不存在')
     } else {
-      var mdPicArr = findresault[0].mdPic
-      for (var i = 0; i < mdPicArr.length; i++) {
-        var readPicFile = await fsPromises.readdir('./public/images')
-        var picNameSplit = mdPicArr[i].split('\\')
-        var picName = picNameSplit[picNameSplit.length - 1]
-        if (mdPicArr[i].length != 0 && readPicFile.includes(picName)) {
-          await fsPromises.unlink(mdPicArr[i])
-        }
+      var mdPicID = findresault[0].mdPic
+      for (var i = 0; i < mdPicID.length; i++) {
+
+
+        imgModel.findById(mdPicID, function (err, doc) {
+          if (err) {
+            console.log(err)
+            // res.send({'err':err})
+          } else {
+            imgModel.deleteOne(mdPicID, function (error, resault) {
+              if (err) {
+                console.log(error)
+                // res.send({'error':error})
+              } else {
+                console.log('removed')
+              }
+            })
+          }
+        });
       }
       await PageModel.deleteOne({ _id: id })
       res.send('删除成功')
