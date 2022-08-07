@@ -40,7 +40,7 @@ router.get('/getPic/:pic', function (req, res) {
     if (err) {
       console.log(err)
     } else {
-      console.log(doc.img.data.toString('base64'))
+      // console.log(doc.img.data.toString('base64'))
       // res.contentType(doc.img.contentType);
       res.send('data:image/png;base64,' + doc.img.data.toString('base64'));
 
@@ -127,7 +127,7 @@ router.post('/submitPage', function (req, res) {
       } else {
         // 处理封面图片
         var pic_path = files.pic[0].path
-        console.log(pic_path, 'pic_path')
+        // console.log(pic_path, 'pic_path')
         var img = new imgModel
         img.img.data = fs.readFileSync(pic_path);
         img.img.contentType = 'image/png';
@@ -366,6 +366,7 @@ router.post('/removeArticle', function (req, res) {
 
 // 接收留言
 router.post('/submitComment', function (req, res) {
+  console.log('提交评论')
   var { userComment, articleId, userName, userId, articleTitle } = req.body
   var now = new Date()
   var day = now.getDate()
