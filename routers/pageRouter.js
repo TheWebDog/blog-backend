@@ -127,6 +127,7 @@ router.post('/submitPage', function (req, res) {
       } else {
         // 处理封面图片
         var pic_path = files.pic[0].path
+        console.log(pic_path,'pic_path')
         var img = new imgModel
         img.img.data = fs.readFileSync(pic_path);
         img.img.contentType = 'image/png';
@@ -134,7 +135,8 @@ router.post('/submitPage', function (req, res) {
           if (error) {
             console.log(error)
           } else {
-            picId=a._id
+            picId = a._id
+            console.log(a)
             requirePath = `https://${req.headers.host}/page/getPic/${a._id}`
 
 
