@@ -71,7 +71,7 @@ router.post('/login', function (req, res) {
 })
 
 // 获取用户名单
-router.post('/getUserList', function (req, res) {
+router.get('/getUserList', function (req, res) {
   // var { name, password } = req.body
   ;(async () => {
     // 读取user数据库
@@ -83,6 +83,7 @@ router.post('/getUserList', function (req, res) {
 // 删除用户名
 router.post('/removeUser', function (req, res) {
   console.log(req.body)
+  var {id} = req.body
   UserModel.deleteOne({ _id: id })
     .then(() => {
       res.send('删除成功')
