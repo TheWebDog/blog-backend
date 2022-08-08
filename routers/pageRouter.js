@@ -342,7 +342,8 @@ router.post('/removeArticle', function (req, res) {
       var articleId = id
       var Commentfindresault = await UserCommentModel.find({ articleId: articleId })
       if (Commentfindresault.length == 0) {
-        res.send('该评论不存在')
+        // res.send('该评论不存在')
+        // console.log('这篇文章没有评论')
       } else {
         Commentfindresault.forEach((item) => {
           item.remove()
