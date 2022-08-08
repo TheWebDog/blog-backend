@@ -42,11 +42,9 @@ router.get('/getPic/:pic', function (req, res) {
     } else {
       // console.log(doc.img.data.toString('base64'))
       // res.contentType(doc.img.contentType);
-      res.send('data:image/png;base64,' + doc.img.data.toString('base64'));
-
+      res.send('data:image/png;base64,' + doc.img.data.toString('base64'))
     }
-  });
-
+  })
 })
 
 // md文章图片删除
@@ -55,18 +53,18 @@ router.get('/removePic/:pic', function (req, res) {
   imgModel.findById(picId, function (err, doc) {
     if (err) {
       console.log(err)
-      res.send({ 'err': err })
+      res.send({ err: err })
     } else {
       imgModel.deleteOne(picId, function (error, resault) {
         if (err) {
           console.log(error)
-          res.send({ 'error': error })
+          res.send({ error: error })
         } else {
           res.send('removed')
         }
       })
     }
-  });
+  })
 })
 
 // md文章图片增添
@@ -85,9 +83,9 @@ router.post('/submitMavonPic', function (req, res) {
       // var requirePath = `/page/getPic/${pic_path}`
       // res.send({ requirePath, pic_path })
 
-      var img = new imgModel
-      img.img.data = fs.readFileSync(pic_path);
-      img.img.contentType = 'image/png';
+      var img = new imgModel()
+      img.img.data = fs.readFileSync(pic_path)
+      img.img.contentType = 'image/png'
       img.save(function (error, a) {
         if (error) {
           console.log(error)
@@ -100,20 +98,12 @@ router.post('/submitMavonPic', function (req, res) {
   })
 })
 
-
-
-
-
-
-
-
 // 接收文章
 router.post('/submitPage', function (req, res) {
-  ; (async () => {
+  ;(async () => {
     // console.log(req)
     // new一个Form类 并写入存放路径uploadDir
     // var form_pic = new multiparty.Form({ uploadDir: path.resolve('./public/images') })
-
 
     var form_pic = new multiparty.Form()
     // 对数据进行处理
@@ -128,17 +118,16 @@ router.post('/submitPage', function (req, res) {
         // 处理封面图片
         var pic_path = files.pic[0].path
         // console.log(pic_path, 'pic_path')
-        var img = new imgModel
-        img.img.data = fs.readFileSync(pic_path);
-        img.img.contentType = 'image/png';
-        img.save( async (error, a)=> {
+        var img = new imgModel()
+        img.img.data = fs.readFileSync(pic_path)
+        img.img.contentType = 'image/png'
+        img.save(async (error, a) => {
           if (error) {
             console.log(error)
           } else {
             picId = a._id
             // console.log(a)
             requirePath = `/page/getPic/${a._id}`
-
 
             // 数据取出
             var { title, category, synopsis, md, html, mdPic } = fields
@@ -190,28 +179,21 @@ router.post('/submitPage', function (req, res) {
               imgModel.findById(picId, function (err, doc) {
                 if (err) {
                   console.log(err)
-                  res.send({ 'err': err })
+                  res.send({ err: err })
                 } else {
                   imgModel.deleteOne(picId, function (error, resault) {
                     if (err) {
                       console.log(error)
-                      res.send({ 'error': error })
+                      res.send({ error: error })
                     } else {
                       res.send('文章标题重复，请修改')
                     }
                   })
                 }
-              });
+              })
             }
-
-
-
           }
         })
-
-
-
-
       }
     })
   })().catch((e) => console.error(e, 'err'))
@@ -219,7 +201,7 @@ router.post('/submitPage', function (req, res) {
 
 // 保存草稿 待完善
 router.post('/savePage', function (req, res) {
-  ; (async () => {
+  ;(async () => {
     // var form_pic = new multiparty.Form({ uploadDir: path.resolve('./public/images') })
     var form_pic = new multiparty.Form()
     form_pic.parse(req, async (err, fields, files) => {
@@ -236,9 +218,7 @@ router.post('/savePage', function (req, res) {
         var pic_path = files.pic ? files.pic[0].path : null
         mdPic == [''] ? (mdPic = []) : mdPic
         pic_path ? mdPic.push(pic_path) : (mdPic = null)
-        var coverRequirePath = pic_path
-          ? `/page/getPic/${pic_path}`
-          : null
+        var coverRequirePath = pic_path ? `/page/getPic/${pic_path}` : null
 
         const savePage = new SavePageModel({
           title,
@@ -265,7 +245,7 @@ router.post('/savePage', function (req, res) {
 
 // 获取分类列表
 router.get('/getClassify', function (req, res) {
-  ; (async () => {
+  ;(async () => {
     PageModel.find({})
       .then((resault) => {
         var arr = []
@@ -291,77 +271,91 @@ router.post('/search', function (req, res) {
   var { value } = req.body
   var wd = value.split("'").join('').split(' ').join('').toLowerCase()
   var reg = new RegExp(`${wd}`) // 转换成正则表达
-    ; (async () => {
-      // 获取文章列表
-      if (value) {
-        var resault = await PageModel.find({ pinyinAndTitle: reg })
-      } else {
-        var resault = await PageModel.find({})
-      }
-      res.send(resault)
-    })().catch((e) => console.error(e, 'err'))
+  ;(async () => {
+    // 获取文章列表
+    if (value) {
+      var resault = await PageModel.find({ pinyinAndTitle: reg })
+    } else {
+      var resault = await PageModel.find({})
+    }
+    res.send(resault)
+  })().catch((e) => console.error(e, 'err'))
 })
 
 // 分类文章列表
 router.post('/getList', function (req, res) {
   var { value } = req.body
-    ; (async () => {
-      // 获取文章列表
-      if (value) {
-        var resault = await PageModel.find({ category: value })
-      } else {
-        var resault = await PageModel.find({})
-      }
-      res.send(resault)
-    })()
+  ;(async () => {
+    // 获取文章列表
+    if (value) {
+      var resault = await PageModel.find({ category: value })
+    } else {
+      var resault = await PageModel.find({})
+    }
+    res.send(resault)
+  })()
 })
 
 // 获取文章
 router.post('/getArticlePage', function (req, res) {
   var { id } = req.body
-    ; (async () => {
-      var findresault = await PageModel.find({ _id: id })
+  ;(async () => {
+    var findresault = await PageModel.find({ _id: id })
 
-      if (findresault.length == 0) {
-        res.send('文章丢失')
-      } else {
-        res.send(findresault[0])
-      }
-    })().catch((e) => console.error(e, 'err'))
+    if (findresault.length == 0) {
+      res.send('文章丢失')
+    } else {
+      res.send(findresault[0])
+    }
+  })().catch((e) => console.error(e, 'err'))
 })
 
 // 删除文章
 router.post('/removeArticle', function (req, res) {
   var { id } = req.body
-    ; (async () => {
-      var findresault = await PageModel.find({ _id: id })
-      if (findresault.length == 0) {
-        res.send('文章不存在')
-      } else {
-        var mdPicID = findresault[0].mdPic
-        for (var i = 0; i < mdPicID.length; i++) {
-
-
-          imgModel.findById(mdPicID, function (err, doc) {
-            if (err) {
-              console.log(err)
-              // res.send({'err':err})
-            } else {
-              imgModel.deleteOne(mdPicID, function (error, resault) {
-                if (err) {
-                  console.log(error)
-                  // res.send({'error':error})
-                } else {
-                  console.log('removed')
-                }
-              })
-            }
-          });
-        }
-        await PageModel.deleteOne({ _id: id })
-        res.send('删除成功')
+  ;(async () => {
+    var findresault = await PageModel.find({ _id: id })
+    if (findresault.length == 0) {
+      res.send('文章不存在')
+    } else {
+      // 删除与文章关联的图片
+      var mdPicID = findresault[0].mdPic
+      for (var i = 0; i < mdPicID.length; i++) {
+        imgModel.findById(mdPicID, function (err, doc) {
+          if (err) {
+            console.log(err)
+            // res.send({'err':err})
+          } else {
+            imgModel.deleteOne(mdPicID, function (error, resault) {
+              if (err) {
+                console.log(error)
+                // res.send({'error':error})
+              } else {
+                console.log('removed')
+              }
+            })
+          }
+        })
       }
-    })().catch((e) => console.error(e, 'err'))
+
+      // 删除与文章关联的评论
+      var articleId = id
+      var findresault = await UserCommentModel.find({ articleId: articleId })
+      if (findresault.length == 0) {
+        res.send('该评论不存在')
+      } else {
+        findresault.forEach((item) => {
+          item.remove()
+        })
+        await UserCommentModel.delete({ articleId: articleId })
+        // res.send('删除成功')
+      }
+
+      // 删除文章
+      await PageModel.deleteOne({ _id: id })
+      res.send('删除成功')
+    }
+  })().catch((e) => console.error(e, 'err'))
 })
 
 // 接收留言
@@ -397,17 +391,17 @@ router.post('/submitComment', function (req, res) {
 // 获取留言
 router.post('/getArticleComment', function (req, res) {
   var { articleId } = req.body
-    // console.log(req.body)
-    ; (async () => {
-      if (articleId) {
-        var findresault = await UserCommentModel.find({ articleId: articleId })
-        res.send(findresault)
-      } else {
-        var findresault = await UserCommentModel.find({})
-        // console.log(findresault,'findresault')
-        res.send(findresault)
-      }
-    })().catch((e) => console.error(e, 'err'))
+  // console.log(req.body)
+  ;(async () => {
+    if (articleId) {
+      var findresault = await UserCommentModel.find({ articleId: articleId })
+      res.send(findresault)
+    } else {
+      var findresault = await UserCommentModel.find({})
+      // console.log(findresault,'findresault')
+      res.send(findresault)
+    }
+  })().catch((e) => console.error(e, 'err'))
 })
 
 // 接收留言的留言
@@ -424,53 +418,50 @@ router.post('/submitCommentComment', function (req, res) {
     userId,
     date,
   }
-    ; (async () => {
-      var findresault = await UserCommentModel.find({ _id: commentId })
-      var { childrenComment } = findresault[0]
-      childrenComment.push(obj)
-      await UserCommentModel.updateOne(
-        { _id: commentId },
-        { childrenComment: childrenComment }
-      )
-      res.send('评论成功')
-    })().catch((e) => console.error(e, 'err'))
+  ;(async () => {
+    var findresault = await UserCommentModel.find({ _id: commentId })
+    var { childrenComment } = findresault[0]
+    childrenComment.push(obj)
+    await UserCommentModel.updateOne(
+      { _id: commentId },
+      { childrenComment: childrenComment }
+    )
+    res.send('评论成功')
+  })().catch((e) => console.error(e, 'err'))
 })
 
 // 删除评论
 router.post('/removeComment', function (req, res) {
   var { id } = req.body
-    ; (async () => {
-      var findresault = await UserCommentModel.find({ _id: id })
-      if (findresault.length == 0) {
-        res.send('该评论不存在')
-      } else {
-        await UserCommentModel.deleteOne({ _id: id })
-        res.send('删除成功')
-      }
-    })().catch((e) => console.error(e, 'err'))
+  ;(async () => {
+    var findresault = await UserCommentModel.find({ _id: id })
+    if (findresault.length == 0) {
+      res.send('该评论不存在')
+    } else {
+      await UserCommentModel.deleteOne({ _id: id })
+      res.send('删除成功')
+    }
+  })().catch((e) => console.error(e, 'err'))
 })
 
 // 删除子评论
 router.post('/removeChildren', function (req, res) {
   var { userComment, id } = req.body
-    ; (async () => {
-      var findresault = await UserCommentModel.find({ _id: id })
-      if (findresault.length == 0) {
-        res.send('该评论不存在')
-      } else {
-        var arr = []
-        var { childrenComment } = findresault[0]
-        childrenComment.forEach((item) => {
-          if (item.userComment != userComment) {
-            arr.push(item)
-          }
-        });
-        await UserCommentModel.updateOne(
-          { _id: id },
-          { childrenComment: arr }
-        )
-        res.send('删除成功')
-      }
-    })().catch((e) => console.error(e, 'err'))
+  ;(async () => {
+    var findresault = await UserCommentModel.find({ _id: id })
+    if (findresault.length == 0) {
+      res.send('该评论不存在')
+    } else {
+      var arr = []
+      var { childrenComment } = findresault[0]
+      childrenComment.forEach((item) => {
+        if (item.userComment != userComment) {
+          arr.push(item)
+        }
+      })
+      await UserCommentModel.updateOne({ _id: id }, { childrenComment: arr })
+      res.send('删除成功')
+    }
+  })().catch((e) => console.error(e, 'err'))
 })
 module.exports = router
