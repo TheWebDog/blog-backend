@@ -92,7 +92,7 @@ router.post('/submitMavonPic', function (req, res) {
         if (error) {
           console.log(error)
         } else {
-          var requirePath = `https://${req.headers.host}/page/getPic/${a._id}`
+          var requirePath = `http://${req.headers.host}/page/getPic/${a._id}`
           res.send(requirePath)
         }
       })
@@ -136,8 +136,8 @@ router.post('/submitPage', function (req, res) {
             console.log(error)
           } else {
             picId = a._id
-            console.log(a)
-            requirePath = `https://${req.headers.host}/page/getPic/${a._id}`
+            // console.log(a)
+            requirePath = `http://${req.headers.host}/page/getPic/${a._id}`
 
 
             // 数据取出
@@ -237,7 +237,7 @@ router.post('/savePage', function (req, res) {
         mdPic == [''] ? (mdPic = []) : mdPic
         pic_path ? mdPic.push(pic_path) : (mdPic = null)
         var coverRequirePath = pic_path
-          ? `https://${req.headers.host}/page/getPic/${pic_path}`
+          ? `http://${req.headers.host}/page/getPic/${pic_path}`
           : null
 
         const savePage = new SavePageModel({
