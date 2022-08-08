@@ -21,7 +21,7 @@ router.get('/test', (req, res) => {
 
 // 图片
 // 获取图片base64数据
-// 格式：https://blog-backend-maoagmycv-thewebdog.vercel.app/page/getPic/homePage2.gif
+// 格式：/page/getPic/homePage2.gif
 router.get('/getPic/:pic', function (req, res) {
   // var getPic =req.params.pic
   // res.sendFile(path.resolve(`./public/${getPic}`), function (err) {
@@ -82,7 +82,7 @@ router.post('/submitMavonPic', function (req, res) {
     } else {
       var pic_path = files.mavon_editor_pic[0].path
 
-      // var requirePath = `https://${req.headers.host}/page/getPic/${pic_path}`
+      // var requirePath = `/page/getPic/${pic_path}`
       // res.send({ requirePath, pic_path })
 
       var img = new imgModel
@@ -92,7 +92,7 @@ router.post('/submitMavonPic', function (req, res) {
         if (error) {
           console.log(error)
         } else {
-          var requirePath = `http://${req.headers.host}/page/getPic/${a._id}`
+          var requirePath = `/page/getPic/${a._id}`
           res.send(requirePath)
         }
       })
@@ -137,7 +137,7 @@ router.post('/submitPage', function (req, res) {
           } else {
             picId = a._id
             // console.log(a)
-            requirePath = `http://${req.headers.host}/page/getPic/${a._id}`
+            requirePath = `/page/getPic/${a._id}`
 
 
             // 数据取出
@@ -237,7 +237,7 @@ router.post('/savePage', function (req, res) {
         mdPic == [''] ? (mdPic = []) : mdPic
         pic_path ? mdPic.push(pic_path) : (mdPic = null)
         var coverRequirePath = pic_path
-          ? `http://${req.headers.host}/page/getPic/${pic_path}`
+          ? `/page/getPic/${pic_path}`
           : null
 
         const savePage = new SavePageModel({
