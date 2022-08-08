@@ -340,11 +340,11 @@ router.post('/removeArticle', function (req, res) {
 
       // 删除与文章关联的评论
       var articleId = id
-      var findresault = await UserCommentModel.find({ articleId: articleId })
-      if (findresault.length == 0) {
+      var Commentfindresault = await UserCommentModel.find({ articleId: articleId })
+      if (Commentfindresault.length == 0) {
         res.send('该评论不存在')
       } else {
-        findresault.forEach((item) => {
+        Commentfindresault.forEach((item) => {
           item.remove()
         })
         await UserCommentModel.delete({ articleId: articleId })
@@ -352,7 +352,7 @@ router.post('/removeArticle', function (req, res) {
       }
 
       // 删除文章
-      await PageModel.deleteOne({ _id: id })
+      await findresault.remove()
       res.send('删除成功')
     }
   })().catch((e) => console.error(e, 'err'))
