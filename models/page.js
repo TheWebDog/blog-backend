@@ -10,6 +10,7 @@ const Page = mongooseConnected.Schema({
   md: String, // md原文
   html: String, // 转化后的html
   mdPic: Array, // 有关图片文件路径
+  mdCatalog:String, // 目录
 })
 
 const PageModel = mongooseConnected.model('pageData', Page)

@@ -130,7 +130,7 @@ router.post('/submitPage', function (req, res) {
             requirePath = `/page/getPic/${a._id}`
 
             // 数据取出
-            var { title, category, synopsis, md, html, mdPic } = fields
+            var { title, category, synopsis, md, html, mdPic ,mdCatalog } = fields
             // 我去太奶奶的 竟然都是数组 就那么一项 给我整数组嘎哈 靠靠靠靠靠 mlgbz的
             var title = title[0]
             // 判断重名文章
@@ -141,6 +141,7 @@ router.post('/submitPage', function (req, res) {
               var synopsis = synopsis[0]
               var md = md[0]
               var html = html[0]
+              var mdCatalog = mdCatalog[0]
               mdPic[0].length == 0 ? (mdPic = []) : mdPic
               mdPic.push(picId)
               var coverRequirePath = requirePath
@@ -163,6 +164,7 @@ router.post('/submitPage', function (req, res) {
                 md,
                 html,
                 mdPic,
+                mdCatalog,
               })
               thepage.save(function (err, result) {
                 // 文章存入mongoose
@@ -353,7 +355,7 @@ router.post('/removeArticle', function (req, res) {
       }
 
       // 删除文章
-      await PageModel.delete({ _id: id })
+      await findresault[0].remove()
       res.send('删除成功')
     }
   })().catch((e) => console.error(e, 'err'))
