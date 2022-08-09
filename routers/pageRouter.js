@@ -353,7 +353,7 @@ router.post('/removeArticle', function (req, res) {
       }
 
       // 删除文章
-      await findresault.remove()
+      await PageModel.delete({ _id: id })
       res.send('删除成功')
     }
   })().catch((e) => console.error(e, 'err'))
