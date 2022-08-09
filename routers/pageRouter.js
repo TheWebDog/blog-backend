@@ -170,7 +170,7 @@ router.post('/submitPage', function (req, res) {
                 // 文章存入mongoose
                 if (err) {
                   console.log(err, '-----------err')
-                  res.send('失败')
+                  res.send('存入mongoose失败')
                 } else {
                   // console.log(result, '-----------res')
                   res.send('成功')
@@ -186,7 +186,7 @@ router.post('/submitPage', function (req, res) {
                   imgModel.deleteOne(picId, function (error, resault) {
                     if (err) {
                       console.log(error)
-                      res.send({ error: error })
+                      res.send({ '错误': error })
                     } else {
                       res.send('文章标题重复，请修改')
                     }
