@@ -333,6 +333,14 @@ router.post('/getArticlePage', function (req, res) {
       res.send('文章丢失')
     } else {
       // console.log(findresault[0].html)
+      
+        var picrequire = findresault[0].coverRequirePath
+        // var picId = picrequire.split('/')[3]
+        var picId = picrequire
+        var doc = await imgModel.findById(picId)
+        var picSrc = 'data:image/png;base64,' + doc.img.data.toString('base64')
+        findresault[0].coverRequirePath = picSrc
+      
       res.send(findresault[0])
     }
   })().catch((e) => console.error(e, 'err'))
