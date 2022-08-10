@@ -42,6 +42,12 @@ router.get('/getPic/:pic', function (req, res) {
     } else {
       // console.log(doc.img.data.toString('base64'))
       // res.contentType(doc.img.contentType);
+
+      // var file = new Buffer(doc.file, 'base64');
+      // var file = doc.img.data.toString('base64')
+      // console.log(doc.img.contentType)
+      // res.writeHead(200, {'Content-Type': doc.img.contentType, 'Content-Transfer-Encoding': 'base64'});
+      // res.end(doc);
       res.send('data:image/png;base64,' + doc.img.data.toString('base64'))
     }
   })
@@ -68,35 +74,35 @@ router.get('/removePic/:pic', function (req, res) {
 })
 
 // md文章图片增添
-router.post('/submitMavonPic', function (req, res) {
-  // 对图片的处理
-  // var form_pic = new multiparty.Form({ uploadDir: './public/images' }) 修改了
-  // var form_pic = new multiparty.Form({ uploadDir: path.resolve('./public/images') })
-  var form_pic = new multiparty.Form()
-  form_pic.parse(req, async (err, fields, files) => {
-    if (err) {
-      console.log('submitMavonPic时err了', err)
-      res.send('submitMavonPic时err了')
-    } else {
-      var pic_path = files.mavon_editor_pic[0].path
+// router.post('/submitMavonPic', function (req, res) {
+//   // 对图片的处理
+//   // var form_pic = new multiparty.Form({ uploadDir: './public/images' }) 修改了
+//   // var form_pic = new multiparty.Form({ uploadDir: path.resolve('./public/images') })
+//   var form_pic = new multiparty.Form()
+//   form_pic.parse(req, async (err, fields, files) => {
+//     if (err) {
+//       console.log('submitMavonPic时err了', err)
+//       res.send('submitMavonPic时err了')
+//     } else {
+//       var pic_path = files.mavon_editor_pic[0].path
 
-      // var requirePath = `/page/getPic/${pic_path}`
-      // res.send({ requirePath, pic_path })
+//       // var requirePath = `/page/getPic/${pic_path}`
+//       // res.send({ requirePath, pic_path })
 
-      var img = new imgModel()
-      img.img.data = fs.readFileSync(pic_path)
-      img.img.contentType = 'image/png'
-      img.save(function (error, a) {
-        if (error) {
-          console.log(error)
-        } else {
-          var requirePath = `/page/getPic/${a._id}`
-          res.send(requirePath)
-        }
-      })
-    }
-  })
-})
+//       var img = new imgModel()
+//       img.img.data = fs.readFileSync(pic_path)
+//       img.img.contentType = 'image/png'
+//       img.save(function (error, a) {
+//         if (error) {
+//           console.log(error)
+//         } else {
+//           var requirePath = `${a._id}`
+//           res.send(requirePath)
+//         }
+//       })
+//     }
+//   })
+// })
 
 // 接收文章
 router.post('/submitPage', function (req, res) {
@@ -127,7 +133,7 @@ router.post('/submitPage', function (req, res) {
           } else {
             picId = a._id
             // console.log(a)
-            requirePath = `/page/getPic/${a._id}`
+            requirePath = `${a._id}` 
 
             // 数据取出
             var { title, category, synopsis, md, html, mdPic ,mdCatalog } = fields
@@ -217,10 +223,13 @@ router.post('/savePage', function (req, res) {
         var synopsis = synopsis[0] ? synopsis[0] : null
         var md = md[0] ? md[0] : null
 
-        var pic_path = files.pic ? files.pic[0].path : null
-        mdPic == [''] ? (mdPic = []) : mdPic
-        pic_path ? mdPic.push(pic_path) : (mdPic = null)
-        var coverRequirePath = pic_path ? `/page/getPic/${pic_path}` : null
+        // var pic_path = files.pic ? files.pic[0].path : null
+
+
+        // mdPic == [''] ? (mdPic = []) : mdPic
+        // pic_path ? mdPic.push(pic_path) : (mdPic = null)
+        // var coverRequirePath = pic_path ? `${pic_path}` : null
+        var coverRequirePath =null
 
         const savePage = new SavePageModel({
           title,
@@ -280,6 +289,14 @@ router.post('/search', function (req, res) {
     } else {
       var resault = await PageModel.find({})
     }
+    for (let index = 0; index < resault.length; index++) {
+      var picrequire = resault[index].coverRequirePath
+      // var picId = picrequire.split('/')[3]
+      var picId = picrequire
+      var doc = await imgModel.findById(picId)
+      var picSrc = 'data:image/png;base64,' + doc.img.data.toString('base64')
+      resault[index].coverRequirePath = picSrc
+    }
     res.send(resault)
   })().catch((e) => console.error(e, 'err'))
 })
@@ -294,8 +311,16 @@ router.post('/getList', function (req, res) {
     } else {
       var resault = await PageModel.find({})
     }
+    for (let index = 0; index < resault.length; index++) {
+      var picrequire = resault[index].coverRequirePath
+      // var picId = picrequire.split('/')[3]
+      var picId = picrequire
+      var doc = await imgModel.findById(picId)
+      var picSrc = 'data:image/png;base64,' + doc.img.data.toString('base64')
+      resault[index].coverRequirePath = picSrc
+    }
     res.send(resault)
-  })()
+  })().catch((e) => console.error(e, 'err'))
 })
 
 // 获取文章
@@ -307,6 +332,7 @@ router.post('/getArticlePage', function (req, res) {
     if (findresault.length == 0) {
       res.send('文章丢失')
     } else {
+      // console.log(findresault[0].html)
       res.send(findresault[0])
     }
   })().catch((e) => console.error(e, 'err'))
