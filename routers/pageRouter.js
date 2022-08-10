@@ -311,13 +311,17 @@ router.post('/getList', function (req, res) {
     } else {
       var resault = await PageModel.find({})
     }
+
+
     for (let index = 0; index < resault.length; index++) {
       var picrequire = resault[index].coverRequirePath
-      // var picId = picrequire.split('/')[3]
       var picId = picrequire
       var doc = await imgModel.findById(picId)
       var picSrc = 'data:image/png;base64,' + doc.img.data.toString('base64')
       resault[index].coverRequirePath = picSrc
+      resault[index].coverRequirePath.mdCatalog = null
+      resault[index].coverRequirePath.html = null
+      resault[index].coverRequirePath.md =null
     }
     res.send(resault)
   })().catch((e) => console.error(e, 'err'))
