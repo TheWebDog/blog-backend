@@ -9,6 +9,7 @@ const UserCommentModel = require('../models/comment')
 const imgModel = require('../models/imgModel')
 const pinyinPro = require('pinyin-pro').pinyin
 const path = require('path')
+const UserModel = require('../models/user')
 
 const multiparty = require('multiparty') // 处理fromdata图片的中间件
 
@@ -337,10 +338,8 @@ router.post('/getArticlePage', function (req, res) {
       res.send('文章丢失')
     } else {
       // console.log(findresault[0].html)
-      
-        var picrequire = findresault[0].coverRequirePath
         // var picId = picrequire.split('/')[3]
-        var picId = picrequire
+        var picId = findresault[0].coverRequirePath
         var doc = await imgModel.findById(picId)
         var picSrc = 'data:image/png;base64,' + doc.img.data.toString('base64')
         findresault[0].coverRequirePath = picSrc
@@ -436,12 +435,23 @@ router.post('/getArticleComment', function (req, res) {
   ;(async () => {
     if (articleId) {
       var findresault = await UserCommentModel.find({ articleId: articleId })
-      res.send(findresault)
     } else {
       var findresault = await UserCommentModel.find({})
       // console.log(findresault,'findresault')
-      res.send(findresault)
     }
+
+    for (let index = 0; index < findresault.length; index++) {
+      var Id = findresault[index].userId
+      for (let j = 0; j < findresault[index].childrenComment.length; j++){
+        var ChildId = findresault[index].childrenComment[j].userId
+        var childrenCommentUser = await UserModel.findById(ChildId)
+        findresault[index].childrenComment[j].userName = childrenCommentUser.name
+      }
+      var CommentUser = await UserModel.findById(Id)
+      findresault[index].userName = CommentUser.name
+    }
+
+    res.send(findresault)
   })().catch((e) => console.error(e, 'err'))
 })
 
