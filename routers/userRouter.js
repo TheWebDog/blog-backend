@@ -3,8 +3,22 @@ const router = express.Router()
 const fsPromises = require('fs').promises
 const async = require('async')
 const UserModel = require('../models/user')
+const { generatorToken, verifyToken } = require('../tools/jwt')
 
 // const bcrypt = require('bcrypt') 用于给用户加密 密码变为哈希值
+
+var bcrypt = require('bcryptjs');    //引入bcryptjs库
+var salt = bcrypt.genSaltSync(12);    //定义密码加密的计算强度,默认10
+// var hash = bcrypt.hashSync(passWord, salt);    //把自己的密码(this.registerForm.passWord)带进去,变量hash就是加密后的密码
+
+// cookie有效时长
+var effectiveDuration = 1000000
+
+router.post('/check', verifyToken, (req, res) => {
+  // console.log(req.body.tokenData.user.power)
+  var user = req.body.tokenData.user
+  res.send({user})
+})
 
 // 录入用户函数
 var informationEntry = async function (name, password) {
@@ -31,13 +45,15 @@ var informationEntry = async function (name, password) {
 router.post('/register', function (req, res) {
   // 检查数据大小
   var { name, password } = req.body
-  console.log(name, password)
+  // console.log(name, password)
   if (name.length <= 10 && password.length <= 20) {
     // 数据大小通过
-    ;(async () => {
+    ; (async () => {
       var findUser = await UserModel.find({ name: name })
       if (findUser == 0) {
-        await informationEntry(name, password)
+        var hash = bcrypt.hashSync(password, salt)
+        // console.log(hash)
+        await informationEntry(name, hash)
         res.send('注册成功')
       } else {
         res.send('用户已存在')
@@ -53,27 +69,31 @@ router.post('/register', function (req, res) {
 // 登录
 router.post('/login', function (req, res) {
   var { name, password } = req.body
-  ;(async () => {
-    // 读取user数据库
-    var resault = await UserModel.find({ name: name })
-    if (resault.length != 0) {
-      var user = resault[0]
-      if ((user.password = password)) {
-        // var power=user.power
-        res.send({ user })
+    ; (async () => {
+      // 读取user数据库
+      var resault = await UserModel.find({ name: name })
+      if (resault.length != 0) {
+        var user = resault[0]
+        var hash = bcrypt.hashSync(password, salt)
+        if ((user.password = hash)) {
+          var tokenData = { user }
+          var token = generatorToken(tokenData, effectiveDuration)
+          // res.cookie('token', token, { maxAge: effectiveDuration })  // 因为一些问题 cookie无法设置在浏览器
+          res.send({token})
+          // res.send({ user })
+        } else {
+          res.send('密码错误')
+        }
       } else {
-        res.send('密码错误')
+        res.send('该用户不存在')
       }
-    } else {
-      res.send('该用户不存在')
-    }
-  })().catch((e) => console.error(e, 'err'))
+    })().catch((e) => console.error(e, 'err'))
 })
 
 // 获取用户名单
 router.get('/getUserList', function (req, res) {
   // var { name, password } = req.body
-  ;(async () => {
+  ; (async () => {
     // 读取user数据库
     var resault = await UserModel.find({})
     res.send(resault)
@@ -83,7 +103,7 @@ router.get('/getUserList', function (req, res) {
 // 删除用户名
 router.post('/removeUser', function (req, res) {
   console.log(req.body)
-  var {id} = req.body
+  var { id } = req.body
   UserModel.deleteOne({ _id: id })
     .then(() => {
       res.send('删除成功')
@@ -95,13 +115,13 @@ router.post('/removeUser', function (req, res) {
 
 // 更改用户名
 router.post('/changeUser', function (req, res) {
-  var { id ,value} = req.body
+  var { id, value } = req.body
   UserModel.updateOne(
     { _id: id },
     { power: value }
-    ).then(() => {
-      res.send('更改成功')
-    })
+  ).then(() => {
+    res.send('更改成功')
+  })
     .catch((e) => {
       res.send(e, 'err')
     })

@@ -10,6 +10,7 @@ const imgModel = require('../models/imgModel')
 const pinyinPro = require('pinyin-pro').pinyin
 const path = require('path')
 const UserModel = require('../models/user')
+const { generatorToken, verifyToken } = require('../tools/jwt')
 
 const multiparty = require('multiparty') // 处理fromdata图片的中间件
 
@@ -134,10 +135,11 @@ router.post('/submitPage', function (req, res) {
           } else {
             picId = a._id
             // console.log(a)
-            requirePath = `${a._id}` 
+            requirePath = `${a._id}`
 
             // 数据取出
-            var { title, category, synopsis, md, html, mdPic ,mdCatalog } = fields
+            var { title, category, synopsis, md, html, mdPic, mdCatalog } =
+              fields
             // 我去太奶奶的 竟然都是数组 就那么一项 给我整数组嘎哈 靠靠靠靠靠 mlgbz的
             var title = title[0]
             // 判断重名文章
@@ -193,7 +195,7 @@ router.post('/submitPage', function (req, res) {
                   imgModel.deleteOne(picId, function (error, resault) {
                     if (err) {
                       console.log(error)
-                      res.send({ '错误': error })
+                      res.send({ 错误: error })
                     } else {
                       res.send('文章标题重复，请修改')
                     }
@@ -226,11 +228,10 @@ router.post('/savePage', function (req, res) {
 
         // var pic_path = files.pic ? files.pic[0].path : null
 
-
         // mdPic == [''] ? (mdPic = []) : mdPic
         // pic_path ? mdPic.push(pic_path) : (mdPic = null)
         // var coverRequirePath = pic_path ? `${pic_path}` : null
-        var coverRequirePath =null
+        var coverRequirePath = null
 
         const savePage = new SavePageModel({
           title,
@@ -313,7 +314,6 @@ router.post('/getList', function (req, res) {
       var resault = await PageModel.find({})
     }
 
-
     for (let index = 0; index < resault.length; index++) {
       var picrequire = resault[index].coverRequirePath
       var picId = picrequire
@@ -322,7 +322,7 @@ router.post('/getList', function (req, res) {
       resault[index].coverRequirePath = picSrc
       resault[index].coverRequirePath.mdCatalog = null
       resault[index].coverRequirePath.html = null
-      resault[index].coverRequirePath.md =null
+      resault[index].coverRequirePath.md = null
     }
     res.send(resault)
   })().catch((e) => console.error(e, 'err'))
@@ -338,12 +338,12 @@ router.post('/getArticlePage', function (req, res) {
       res.send('文章丢失')
     } else {
       // console.log(findresault[0].html)
-        // var picId = picrequire.split('/')[3]
-        var picId = findresault[0].coverRequirePath
-        var doc = await imgModel.findById(picId)
-        var picSrc = 'data:image/png;base64,' + doc.img.data.toString('base64')
-        findresault[0].coverRequirePath = picSrc
-      
+      // var picId = picrequire.split('/')[3]
+      var picId = findresault[0].coverRequirePath
+      var doc = await imgModel.findById(picId)
+      var picSrc = 'data:image/png;base64,' + doc.img.data.toString('base64')
+      findresault[0].coverRequirePath = picSrc
+
       res.send(findresault[0])
     }
   })().catch((e) => console.error(e, 'err'))
@@ -379,7 +379,9 @@ router.post('/removeArticle', function (req, res) {
 
       // 删除与文章关联的评论
       var articleId = id
-      var Commentfindresault = await UserCommentModel.find({ articleId: articleId })
+      var Commentfindresault = await UserCommentModel.find({
+        articleId: articleId,
+      })
       if (Commentfindresault.length == 0) {
         // res.send('该评论不存在')
         // console.log('这篇文章没有评论')
@@ -399,9 +401,9 @@ router.post('/removeArticle', function (req, res) {
 })
 
 // 接收留言
-router.post('/submitComment', function (req, res) {
-  console.log('提交评论')
-  var { userComment, articleId, userName, userId, articleTitle } = req.body
+router.post('/submitComment', verifyToken, function (req, res) {
+  var { userComment, articleId } = req.body
+  var userId = req.body.tokenData.user._id
   var now = new Date()
   var day = now.getDate()
   var month = now.getMonth() + 1
@@ -410,19 +412,14 @@ router.post('/submitComment', function (req, res) {
   const theComment = new UserCommentModel({
     userComment,
     articleId,
-    articleTitle,
-    userName,
     userId,
     date,
     childrenComment: [],
   })
   theComment.save(function (err, result) {
-    // 评论存入mongoose
     if (err) {
-      // console.log(err, '-----------err')
       res.send('失败')
     } else {
-      // console.log(result, '-----------res')
       res.send('成功')
     }
   })
@@ -430,34 +427,70 @@ router.post('/submitComment', function (req, res) {
 
 // 获取留言
 router.post('/getArticleComment', function (req, res) {
-  var { articleId } = req.body
-  // console.log(req.body)
-  ;(async () => {
+  ; (async () => {
+    var CommentArr = []
+    var { articleId } = req.body
+
     if (articleId) {
       var findresault = await UserCommentModel.find({ articleId: articleId })
     } else {
       var findresault = await UserCommentModel.find({})
-      // console.log(findresault,'findresault')
     }
 
     for (let index = 0; index < findresault.length; index++) {
-      var Id = findresault[index].userId
-      for (let j = 0; j < findresault[index].childrenComment.length; j++){
+      var everyarticleId = findresault[index].articleId
+      var article = await PageModel.findById(everyarticleId)
+      var CommentUserId = findresault[index].userId
+      var CommentUser = await UserModel.findById(CommentUserId)
+
+      var articleTitle = article.title
+      var userName = CommentUser.name
+      var userComment = findresault[index].userComment
+      var userId = findresault[index].userId
+      var articleId = findresault[index].articleId
+      var date = findresault[index].date
+      var _id = findresault[index]._id
+
+      var theComment = {
+        articleTitle,
+        userName,
+        userComment,
+        userId,
+        articleId,
+        date,
+        childrenComment: [],
+        _id,
+      }
+
+      for (let j = 0; j < findresault[index].childrenComment.length; j++) {
         var ChildId = findresault[index].childrenComment[j].userId
         var childrenCommentUser = await UserModel.findById(ChildId)
-        findresault[index].childrenComment[j].userName = childrenCommentUser.name
-      }
-      var CommentUser = await UserModel.findById(Id)
-      findresault[index].userName = CommentUser.name
-    }
+        userName = childrenCommentUser.name
+        userComment = findresault[index].childrenComment[j].userComment
+        userId = findresault[index].childrenComment[j].userId
+        date = findresault[index].childrenComment[j].date
 
-    res.send(findresault)
+        var thechildrenComment = {
+          userName,
+          userComment,
+          userId,
+          date,
+        }
+        theComment.childrenComment.push(thechildrenComment)
+      }
+
+      CommentArr.push(theComment)
+    }
+    res.send(CommentArr)
+
   })().catch((e) => console.error(e, 'err'))
 })
 
 // 接收留言的留言
-router.post('/submitCommentComment', function (req, res) {
-  var { commentId, userComment, userName, userId } = req.body
+router.post('/submitCommentComment',verifyToken , function (req, res) {
+  var { commentId, userComment } = req.body
+  // console.log(commentId, userComment)
+  var userId = req.body.tokenData.user._id
   var now = new Date()
   var day = now.getDate()
   var month = now.getMonth() + 1
@@ -465,13 +498,14 @@ router.post('/submitCommentComment', function (req, res) {
   var date = `${year}-${month}-${day}`
   var obj = {
     userComment,
-    userName,
     userId,
     date,
   }
   ;(async () => {
-    var findresault = await UserCommentModel.find({ _id: commentId })
-    var { childrenComment } = findresault[0]
+    // console.log(commentId)
+    var findresault = await UserCommentModel.findById(commentId)
+    // console.log(findresault)
+    var { childrenComment } = findresault
     childrenComment.push(obj)
     await UserCommentModel.updateOne(
       { _id: commentId },
