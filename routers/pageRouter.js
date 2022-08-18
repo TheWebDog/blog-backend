@@ -210,51 +210,51 @@ router.post('/submitPage', function (req, res) {
   })().catch((e) => console.error(e, 'err'))
 })
 
-// 保存草稿 待完善
-router.post('/savePage', function (req, res) {
-  ;(async () => {
-    // var form_pic = new multiparty.Form({ uploadDir: path.resolve('./public/images') })
-    var form_pic = new multiparty.Form()
-    form_pic.parse(req, async (err, fields, files) => {
-      if (err) {
-        console.log('savePage时err了', err)
-        res.send('savePage时err了')
-      } else {
-        var { title, category, synopsis, md, mdPic } = fields
-        var title = title[0] ? title[0] : null
-        var category = category[0] ? category[0] : null
-        var synopsis = synopsis[0] ? synopsis[0] : null
-        var md = md[0] ? md[0] : null
+// 保存草稿 待完善 // 弃用
+// router.post('/savePage', function (req, res) {
+//   ;(async () => {
+//     // var form_pic = new multiparty.Form({ uploadDir: path.resolve('./public/images') })
+//     var form_pic = new multiparty.Form()
+//     form_pic.parse(req, async (err, fields, files) => {
+//       if (err) {
+//         console.log('savePage时err了', err)
+//         res.send('savePage时err了')
+//       } else {
+//         var { title, category, synopsis, md, mdPic } = fields
+//         var title = title[0] ? title[0] : null
+//         var category = category[0] ? category[0] : null
+//         var synopsis = synopsis[0] ? synopsis[0] : null
+//         var md = md[0] ? md[0] : null
 
-        // var pic_path = files.pic ? files.pic[0].path : null
+//         // var pic_path = files.pic ? files.pic[0].path : null
 
-        // mdPic == [''] ? (mdPic = []) : mdPic
-        // pic_path ? mdPic.push(pic_path) : (mdPic = null)
-        // var coverRequirePath = pic_path ? `${pic_path}` : null
-        var coverRequirePath = null
+//         // mdPic == [''] ? (mdPic = []) : mdPic
+//         // pic_path ? mdPic.push(pic_path) : (mdPic = null)
+//         // var coverRequirePath = pic_path ? `${pic_path}` : null
+//         var coverRequirePath = null
 
-        const savePage = new SavePageModel({
-          title,
-          coverRequirePath,
-          category,
-          synopsis,
-          md,
-          mdPic,
-        })
-        savePage.save(function (err, result) {
-          //执行
-          if (err) {
-            console.log(err, '-----------err')
-            res.send('失败')
-          } else {
-            console.log(result, '-----------res')
-            res.send('成功')
-          }
-        })
-      }
-    })
-  })().catch((e) => console.error(e, 'err'))
-})
+//         const savePage = new SavePageModel({
+//           title,
+//           coverRequirePath,
+//           category,
+//           synopsis,
+//           md,
+//           mdPic,
+//         })
+//         savePage.save(function (err, result) {
+//           //执行
+//           if (err) {
+//             console.log(err, '-----------err')
+//             res.send('失败')
+//           } else {
+//             console.log(result, '-----------res')
+//             res.send('成功')
+//           }
+//         })
+//       }
+//     })
+//   })().catch((e) => console.error(e, 'err'))
+// })
 
 // 获取分类列表
 router.get('/getClassify', function (req, res) {
@@ -444,7 +444,7 @@ router.post('/getArticleComment', function (req, res) {
       var CommentUser = await UserModel.findById(CommentUserId)
 
       var articleTitle = article.title
-      var userName = CommentUser.name
+      var userName = CommentUser?CommentUser.name:'此用户已被删除'
       var userComment = findresault[index].userComment
       var userId = findresault[index].userId
       var articleId = findresault[index].articleId
@@ -465,7 +465,7 @@ router.post('/getArticleComment', function (req, res) {
       for (let j = 0; j < findresault[index].childrenComment.length; j++) {
         var ChildId = findresault[index].childrenComment[j].userId
         var childrenCommentUser = await UserModel.findById(ChildId)
-        userName = childrenCommentUser.name
+        userName = childrenCommentUser?childrenCommentUser.name:'此用户已被删除'
         userComment = findresault[index].childrenComment[j].userComment
         userId = findresault[index].childrenComment[j].userId
         date = findresault[index].childrenComment[j].date

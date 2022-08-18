@@ -14,10 +14,26 @@ var salt = bcrypt.genSaltSync(12);    //定义密码加密的计算强度,默认
 // cookie有效时长
 var effectiveDuration = 1000000
 
+// 核对token提取数据
 router.post('/check', verifyToken, (req, res) => {
   // console.log(req.body.tokenData.user.power)
   var user = req.body.tokenData.user
   res.send({user})
+})
+
+// 更新Token
+router.post('/updateToken',verifyToken, (req, res) => {
+  ; (async () => {
+    var _id = req.body.tokenData.user._id
+    var user = await UserModel.findById(_id)
+    if (user) {
+      var tokenData = { user }
+      var token = generatorToken(tokenData, effectiveDuration)
+      res.send({token})
+    } else {
+      res.send('用户不存在')
+    }
+  })().catch((e) => console.error(e, 'err'))
 })
 
 // 录入用户函数
@@ -33,6 +49,11 @@ var informationEntry = async function (name, password) {
     date,
     // 权限大小
     power: 1,
+
+    myCollection:[], // 我的收藏
+    portrait: null,  // 头像图片二进制
+    myReply: [],  // 我的回复
+    alreadyReadReplyNum: 0,  // 已读回复数量
   })
   theUser.save(() => {
     console.log('注册完成')
@@ -50,7 +71,7 @@ router.post('/register', function (req, res) {
     // 数据大小通过
     ; (async () => {
       var findUser = await UserModel.find({ name: name })
-      if (findUser == 0) {
+      if (findUser == 0 && name!='此用户已被删除') {
         var hash = bcrypt.hashSync(password, salt)
         // console.log(hash)
         await informationEntry(name, hash)
@@ -76,6 +97,7 @@ router.post('/login', function (req, res) {
         var user = resault[0]
         var hash = bcrypt.hashSync(password, salt)
         if ((user.password = hash)) {
+          // delete user.password
           var tokenData = { user }
           var token = generatorToken(tokenData, effectiveDuration)
           // res.cookie('token', token, { maxAge: effectiveDuration })  // 因为一些问题 cookie无法设置在浏览器
@@ -113,8 +135,8 @@ router.post('/removeUser', function (req, res) {
     })
 })
 
-// 更改用户名
-router.post('/changeUser', function (req, res) {
+// 更改用户权限
+router.post('/changeUserPower', function (req, res) {
   var { id, value } = req.body
   UserModel.updateOne(
     { _id: id },
