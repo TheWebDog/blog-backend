@@ -9,6 +9,7 @@ const { generatorToken, verifyToken } = require('../tools/jwt')
 
 var bcrypt = require('bcryptjs');    //引入bcryptjs库
 var salt = bcrypt.genSaltSync(12);    //定义密码加密的计算强度,默认10
+var hashKeySalt = '541231c3e1ad2was##@&U45f4w3eqa65s5a' // 给hash密码加的盐
 // var hash = bcrypt.hashSync(passWord, salt);    //把自己的密码(this.registerForm.passWord)带进去,变量hash就是加密后的密码
 
 // cookie有效时长
@@ -72,7 +73,7 @@ router.post('/register', function (req, res) {
     ; (async () => {
       var findUser = await UserModel.find({ name: name })
       if (findUser == 0 && name!='此用户已被删除') {
-        var hash = bcrypt.hashSync(password, salt)
+        var hash = bcrypt.hashSync(password+hashKeySalt, salt)
         // console.log(hash)
         await informationEntry(name, hash)
         res.send('注册成功')
@@ -95,7 +96,7 @@ router.post('/login', function (req, res) {
       var resault = await UserModel.find({ name: name })
       if (resault.length != 0) {
         var user = resault[0]
-        var hash = bcrypt.hashSync(password, salt)
+        var hash = bcrypt.hashSync(password+hashKeySalt, salt)
         if ((user.password = hash)) {
           // delete user.password
           var tokenData = { user }
