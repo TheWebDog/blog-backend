@@ -1,10 +1,10 @@
-const mongooseConnected = require('../db')
+// const mongooseConnected = require('../db')
 
-const img = mongooseConnected.Schema({
-  img: { data: Buffer, contentType: String }
-})
+// const img = mongooseConnected.Schema({
+//   img: { data: Buffer, contentType: String }
+// })
 
-const imgModel = mongooseConnected.model('imgData', img)
+// const imgModel = mongooseConnected.model('imgData', img)
 
-module.exports = imgModel
+// module.exports = imgModel
 

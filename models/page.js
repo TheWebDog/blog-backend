@@ -7,9 +7,9 @@ const Page = mongooseConnected.Schema({
   category: String, // 分类
   synopsis: String, // 简介
   date: String, // 日期
-  md: String, // md原文
+  // md: String, // md原文findresault
   html: String, // 转化后的html
-  mdPic: Array, // 有关图片文件路径
+  // mdPic: Array, // 有关图片文件路径
   mdCatalog:String, // 目录
 })
 
