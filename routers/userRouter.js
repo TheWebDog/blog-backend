@@ -17,11 +17,21 @@ var hashKeySalt = '541231c3e1ad2was##@&U45f4w3eqa65s5a' // 给hash密码加的�
 // cookie有效时长
 var effectiveDuration = 1000000
 
-// 核对token提取数据
+// 核对token
 router.post('/check', verifyToken, (req, res) => {
   // console.log(req.body.tokenData.user.power)
   var user = req.body.tokenData.user
   res.send({user})
+})
+
+// token提取数据
+router.post('/getTokenInformation', verifyToken, (req, res) => {
+  // console.log(req.body.tokenData.user.power)
+  ; (async () => {
+    var _id = req.body.tokenData.user._id
+    var user = await UserModel.findById(_id)
+    res.send({user})
+  })().catch((e) => console.error(e, 'err'))
 })
 
 // 更新Token
@@ -96,15 +106,25 @@ router.post('/register', function (req, res) {
 
 // 登录
 router.post('/login', function (req, res) {
-  var { name, password } = req.body
+  
     ; (async () => {
       // 读取user数据库
+      var { name, password } = req.body
       var resault = await UserModel.find({ name: name })
       if (resault.length != 0) {
-        var user = resault[0]
+        var theuser = resault[0]
         var hash = bcrypt.hashSync(password+hashKeySalt, salt)
-        if ((user.password = hash)) {
-          // delete user.password
+        if ((theuser.password = hash)) {
+          // delete theuser.password
+          var name = theuser.name
+          var _id = theuser._id
+          // var password = theuser.password
+          // var date = theuser.date
+          var power = theuser.power
+          // var sex = theuser.sex
+          // var WeChat = theuser.WeChat
+          // var user={name,password,date,power,sex,WeChat}
+          var user={name,power,_id}
           var tokenData = { user }
           var token = generatorToken(tokenData, effectiveDuration)
           // res.cookie('token', token, { maxAge: effectiveDuration })  // 因为一些问题 cookie无法设置在浏览器
@@ -163,7 +183,19 @@ router.post('/myComments', verifyToken, (req, res) => {
       var findresault = await UserCommentModel.find({ userId: userId })
       res.send(findresault)
     })().catch((e) => console.error(e, 'err'))
-
+})
+router.post('/updateMyInformation', verifyToken, (req, res) => {
+  var userId = req.body.tokenData.user._id
+  var { WeChat, name, portrait, sex, signature } = req.body.user
+    ; (async () => {
+      var resalt = await UserModel.updateOne(
+        { _id: userId },
+        { WeChat:WeChat,name:name,portrait:portrait,sex:sex,signature:signature }
+      )
+      var tokenData = { user }
+      var token = generatorToken(tokenData, effectiveDuration)
+      res.send({token})
+    })().catch((e) => console.error(e, 'err'))
 })
 
 module.exports = router

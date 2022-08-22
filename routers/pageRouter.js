@@ -401,8 +401,7 @@ router.post('/search', function (req, res) {
 // 分类文章列表
 router.post('/getList', function (req, res) {
   var { value } = req.body
-    ; (async () => {
-    
+  ;(async () => {
     // 获取文章列表
     if (value) {
       var resault = await PageListModel.find({ category: value })
@@ -443,13 +442,12 @@ router.post('/getList', function (req, res) {
 router.post('/getArticlePage', function (req, res) {
   var { id } = req.body
   ;(async () => {
-    var findresault = await PageModel.findById( id )
+    var findresault = await PageModel.findById(id)
     // var picId = findresault.coverRequirePath
     // var doc = await imgModel.findById(picId)
     // var picSrc = 'data:image/png;base64,' + doc.img.data.toString('base64')
     // findresault.coverRequirePath = picSrc
     res.send(findresault)
-    
   })().catch((e) => console.error(e, 'err'))
 })
 
@@ -478,7 +476,7 @@ router.post('/removeArticle', function (req, res) {
     //     }
     //   })
     // }
-    
+
     // 删除与文章关联的评论
     var articleId = id
     var Commentfindresault = await UserCommentModel.find({
@@ -535,12 +533,18 @@ router.post('/getArticleComment', function (req, res) {
 
     for (let index = 0; index < findresault.length; index++) {
       var everyarticleId = findresault[index].articleId
-      var article = await PageListModel.find({pageId : everyarticleId})
+      var article = await PageListModel.find({ pageId: everyarticleId })
       var CommentUserId = findresault[index].userId
       var CommentUser = await UserModel.findById(CommentUserId)
 
       var articleTitle = article.title
       var userName = CommentUser ? CommentUser.name : '此用户已被删除'
+      var userPortrait = !CommentUser
+        ? ''
+        : CommentUser.portrait != null
+        ? CommentUser.portrait
+          : ''
+      console.log(userPortrait)
       var userComment = findresault[index].userComment
       var userId = findresault[index].userId
       var articleId = findresault[index].articleId
@@ -556,6 +560,7 @@ router.post('/getArticleComment', function (req, res) {
         date,
         childrenComment: [],
         _id,
+        userPortrait,
       }
 
       for (let j = 0; j < findresault[index].childrenComment.length; j++) {
@@ -564,6 +569,11 @@ router.post('/getArticleComment', function (req, res) {
         userName = childrenCommentUser
           ? childrenCommentUser.name
           : '此用户已被删除'
+        var userPortrait = !childrenCommentUser
+          ? ''
+          : childrenCommentUser.portrait != null
+          ? childrenCommentUser.portrait
+          : ''
         userComment = findresault[index].childrenComment[j].userComment
         userId = findresault[index].childrenComment[j].userId
         date = findresault[index].childrenComment[j].date
@@ -573,6 +583,7 @@ router.post('/getArticleComment', function (req, res) {
           userComment,
           userId,
           date,
+          userPortrait,
         }
         theComment.childrenComment.push(thechildrenComment)
       }
