@@ -3,6 +3,8 @@ const router = express.Router()
 const fsPromises = require('fs').promises
 const async = require('async')
 const UserModel = require('../models/user')
+const UserCommentModel = require('../models/comment')
+// const imgModel = require('../models/imgModel')
 const { generatorToken, verifyToken } = require('../tools/jwt')
 
 // const bcrypt = require('bcrypt') 用于给用户加密 密码变为哈希值
@@ -51,7 +53,11 @@ var informationEntry = async function (name, password) {
     // 权限大小
     power: 1,
 
-    myCollection:[], // 我的收藏
+    sex: '',  // 性别
+    WeChat: '', // 微信
+    signature: '',  // 个性签名
+
+    myCollection: [], // 我的收藏
     portrait: null,  // 头像图片二进制
     myReply: [],  // 我的回复
     alreadyReadReplyNum: 0,  // 已读回复数量
@@ -123,7 +129,7 @@ router.get('/getUserList', function (req, res) {
   })().catch((e) => console.error(e, 'err'))
 })
 
-// 删除用户名
+// 删除用户
 router.post('/removeUser', function (req, res) {
   console.log(req.body)
   var { id } = req.body
@@ -148,6 +154,16 @@ router.post('/changeUserPower', function (req, res) {
     .catch((e) => {
       res.send(e, 'err')
     })
+})
+
+// 个人信息
+router.post('/myComments', verifyToken, (req, res) => {
+  var userId = req.body.tokenData.user._id
+    ; (async () => {
+      var findresault = await UserCommentModel.find({ userId: userId })
+      res.send(findresault)
+    })().catch((e) => console.error(e, 'err'))
+
 })
 
 module.exports = router

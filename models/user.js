@@ -1,10 +1,14 @@
 const mongooseConnected = require('../db')
 
 const User = mongooseConnected.Schema({
-  name:String,
+  name:String,  
   password:String,
   date:String,
   power: Number,
+
+  sex: String,  // 性别
+  WeChat: String, // 微信
+  signature: String,  // 个性签名
 
   myCollection:Array, // 我的收藏
   portrait:String,  // 头像图片二进制编码

@@ -535,7 +535,7 @@ router.post('/getArticleComment', function (req, res) {
 
     for (let index = 0; index < findresault.length; index++) {
       var everyarticleId = findresault[index].articleId
-      var article = await PageModel.findById(everyarticleId)
+      var article = await PageListModel.find({pageId : everyarticleId})
       var CommentUserId = findresault[index].userId
       var CommentUser = await UserModel.findById(CommentUserId)
 
