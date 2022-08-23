@@ -38,11 +38,17 @@ router.post('/getTokenInformation', verifyToken, (req, res) => {
 router.post('/updateToken',verifyToken, (req, res) => {
   ; (async () => {
     var _id = req.body.tokenData.user._id
-    var user = await UserModel.findById(_id)
+    var theuser = await UserModel.findById(_id)
     if (user) {
+
+      var name = theuser.name
+      var _id = theuser._id
+      var power = theuser.power
+      var user={name,power,_id}
       var tokenData = { user }
       var token = generatorToken(tokenData, effectiveDuration)
       res.send({token})
+
     } else {
       res.send('用户不存在')
     }
@@ -192,8 +198,23 @@ router.post('/updateMyInformation', verifyToken, (req, res) => {
         { _id: userId },
         { WeChat:WeChat,name:name,portrait:portrait,sex:sex,signature:signature }
       )
-      var tokenData = { user }
-      var token = generatorToken(tokenData, effectiveDuration)
+
+      var theuser = await UserModel.findById(userId)
+      if (theuser) {
+
+        var name = theuser.name
+        var _id = theuser._id
+        var power = theuser.power
+        var user={name,power,_id}
+        var tokenData = { user }
+        var token = generatorToken(tokenData, effectiveDuration)
+        res.send({token})
+
+      } else {
+        res.send('用户不存在')
+      }
+
+
       res.send({token})
     })().catch((e) => console.error(e, 'err'))
 })
