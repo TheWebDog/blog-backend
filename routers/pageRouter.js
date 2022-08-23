@@ -201,6 +201,10 @@ router.post('/submitPage', function (req, res) {
             date: `${now.getFullYear()}-${now.getMonth() + 1}-${now.getDate()}`, // 日期
             html,
             mdCatalog,
+
+            like: 2,
+            view: 2,
+            favorites: 2,
           })
           var result = await thepage.save() // 文章保存
 
