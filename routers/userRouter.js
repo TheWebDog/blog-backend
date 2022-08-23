@@ -190,25 +190,31 @@ router.post('/updateMyInformation', verifyToken, (req, res) => {
     var userId = req.body.tokenData.user._id
     var { WeChat, name, portrait, sex, signature } = req.body.user
     if (name) {
-      var resalt = await UserModel.updateOne(
-        { _id: userId },
-        {
-          WeChat: WeChat,
-          name: name,
-          portrait: portrait,
-          sex: sex,
-          signature: signature,
-        }
-      )
-      var theuser = req.body.tokenData.user
-      // var theuser = await UserModel.findById(userId)
-      // var name = theuser.name
-      var _id = userId
-      var power = theuser.power
-      var user = { name, power, _id }
-      var tokenData = { user }
-      var token = generatorToken(tokenData, effectiveDuration)
-      res.send({ token })
+      var findUser = await UserModel.find({ name: name })
+      if (findUser == 0 && name != '此用户已被删除') {
+        var resalt = await UserModel.updateOne(
+          { _id: userId },
+          {
+            WeChat: WeChat,
+            name: name,
+            portrait: portrait,
+            sex: sex,
+            signature: signature,
+          }
+        )
+        var theuser = req.body.tokenData.user
+        // var theuser = await UserModel.findById(userId)
+        // var name = theuser.name
+        var _id = userId
+        var power = theuser.power
+        var user = { name, power, _id }
+        var tokenData = { user }
+        var token = generatorToken(tokenData, effectiveDuration)
+        res.send({ token })
+      } else {
+        res.send('用户已存在')
+        return
+      }
     } else {
       res.send('name不可为空')
     }
