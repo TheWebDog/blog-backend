@@ -199,21 +199,15 @@ router.post('/updateMyInformation', verifyToken, (req, res) => {
         signature: signature,
       }
     )
-
     var theuser = req.body.tokenData.user
     // var theuser = await UserModel.findById(userId)
-    if (theuser) {
-      // var name = theuser.name
-      var _id = userId
-      var power = theuser.power
-      var user = { name, power, _id }
-      var tokenData = { user }
-      var token = generatorToken(tokenData, effectiveDuration)
-      res.send({ token })
-    } else {
-      res.send('用户不存在')
-    }
-
+    // var name = theuser.name
+    var _id = userId
+    var power = theuser.power
+    var user = { name, power, _id }
+    var tokenData = { user }
+    var token = generatorToken(tokenData, effectiveDuration)
+    res.send({ token })
   })().catch((e) => console.error(e, 'err'))
 })
 
