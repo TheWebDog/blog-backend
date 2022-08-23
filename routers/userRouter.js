@@ -188,9 +188,13 @@ router.post('/myComments', verifyToken, (req, res) => {
 router.post('/updateMyInformation', verifyToken, (req, res) => {
   ;(async () => {
     var userId = req.body.tokenData.user._id
+    var userOldName = req.body.tokenData.user.name
     var { WeChat, name, portrait, sex, signature } = req.body.user
     if (name) {
-      var findUser = await UserModel.find({ name: name })
+      var findUser = 0
+      if (userOldName != name) {
+        findUser = await UserModel.find({ name: name })
+      }
       if (findUser == 0 && name != '此用户已被删除') {
         var resalt = await UserModel.updateOne(
           { _id: userId },
