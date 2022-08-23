@@ -457,9 +457,10 @@ router.post('/getArticlePage', function (req, res) {
 
 // 删除文章
 router.post('/removeArticle', function (req, res) {
-  var { id } = req.body
-  ;(async () => {
-    var findresault = await PageModel.findById(id)
+
+  ; (async () => {
+    var { row } = req.body
+    console.log(row)
 
     // // 删除与文章关联的图片
     // var mdPicID = findresault.mdPic
@@ -482,7 +483,7 @@ router.post('/removeArticle', function (req, res) {
     // }
 
     // 删除与文章关联的评论
-    var articleId = id
+    var articleId = row.pageId
     var Commentfindresault = await UserCommentModel.find({
       articleId: articleId,
     })
@@ -490,10 +491,13 @@ router.post('/removeArticle', function (req, res) {
       Commentfindresault.forEach((item) => {
         item.remove()
       })
-      await UserCommentModel.delete({ articleId: articleId })
     }
     // 删除文章
+
+    var findresault = await PageModel.findById(row.pageId)
     await findresault.remove()
+    var findList = await PageListModel.findById(row._id)
+    await findList.remove()
     res.send('删除成功')
   })().catch((e) => console.error(e, 'err'))
 })
