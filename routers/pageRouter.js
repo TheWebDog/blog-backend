@@ -544,7 +544,7 @@ router.post('/getArticleComment', function (req, res) {
         : CommentUser.portrait != null
         ? CommentUser.portrait
           : ''
-      console.log(userPortrait)
+      // console.log(userPortrait)
       var userComment = findresault[index].userComment
       var userId = findresault[index].userId
       var articleId = findresault[index].articleId

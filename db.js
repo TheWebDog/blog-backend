@@ -33,8 +33,13 @@ const LBdb = 'mongodb://lbs:2019lbs2100@43.142.123.118:27017/LYtestblog'
 const mongoose = require('mongoose');
 mongoose.connect(oldDBurl,{
   useNewUrlParser: true,
-  useUnifiedTopology: true,
-  autoIndex: false
+  // useUnifiedTopology: false,
+  autoIndex: false,
+
+  useUnifiedTopology: false, // 重新链接默认是true
+  // reconnectTries: 30, // 默认也是30次
+  // reconnectInterval: 2000, //默认是1000ms
+  // autoReconnect: true
 });
 
 // 用流 的一个方式监听；
