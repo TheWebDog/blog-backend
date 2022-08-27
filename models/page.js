@@ -12,9 +12,9 @@ const Page = mongooseConnected.Schema({
   // mdPic: Array, // 有关图片文件路径
   mdCatalog: String, // 目录
   
-  like: Number,
-  view: Number,
-  favorites:Number,
+  like: Number, // 喜欢 
+  view: Number, // 查看
+  favorites:Number, // 搜藏
   
 })
 

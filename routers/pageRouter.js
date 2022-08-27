@@ -386,9 +386,9 @@ router.post('/search', function (req, res) {
   ;(async () => {
     // 获取文章列表
     if (value) {
-      var resault = await PageModel.find({ pinyinAndTitle: reg })
+      var resault = await PageListModel.find({ pinyinAndTitle: reg })
     } else {
-      var resault = await PageModel.find({})
+      var resault = await PageListModel.find({})
     }
     // for (let index = 0; index < resault.length; index++) {
     //   var picrequire = resault[index].coverRequirePath
@@ -447,10 +447,15 @@ router.post('/getArticlePage', function (req, res) {
   var { id } = req.body
   ;(async () => {
     var findresault = await PageModel.findById(id)
+    var view = findresault.view + 1 
     // var picId = findresault.coverRequirePath
     // var doc = await imgModel.findById(picId)
     // var picSrc = 'data:image/png;base64,' + doc.img.data.toString('base64')
     // findresault.coverRequirePath = picSrc
+    await PageModel.updateOne(
+      { _id: id },
+      { view: view }
+    )
     res.send(findresault)
   })().catch((e) => console.error(e, 'err'))
 })

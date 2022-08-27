@@ -4,6 +4,8 @@ const fsPromises = require('fs').promises
 const async = require('async')
 const UserModel = require('../models/user')
 const UserCommentModel = require('../models/comment')
+const PageModel = require('../models/page')
+const PageListModel = require('../models/pageList')
 // const imgModel = require('../models/imgModel')
 const { generatorToken, verifyToken } = require('../tools/jwt')
 
@@ -43,7 +45,8 @@ router.post('/updateToken', verifyToken, (req, res) => {
       var name = theuser.name
       var _id = theuser._id
       var power = theuser.power
-      var user = { name, power, _id }
+      var myCollection = theuser.myCollection
+      var user = { name, power, _id, myCollection }
       var tokenData = { user }
       var token = generatorToken(tokenData, effectiveDuration)
       res.send({ token })
@@ -127,7 +130,8 @@ router.post('/login', function (req, res) {
         // var sex = theuser.sex
         // var WeChat = theuser.WeChat
         // var user={name,password,date,power,sex,WeChat}
-        var user = { name, power, _id }
+        var myCollection = theuser.myCollection
+        var user = { name, power, _id, myCollection }
         var tokenData = { user }
         var token = generatorToken(tokenData, effectiveDuration)
         // res.cookie('token', token, { maxAge: effectiveDuration })  // 因为一些问题 cookie无法设置在浏览器
@@ -211,7 +215,8 @@ router.post('/updateMyInformation', verifyToken, (req, res) => {
         // var name = theuser.name
         var _id = userId
         var power = theuser.power
-        var user = { name, power, _id }
+        var myCollection = theuser.myCollection
+        var user = { name, power, _id, myCollection }
         var tokenData = { user }
         var token = generatorToken(tokenData, effectiveDuration)
         res.send({ token })
@@ -223,6 +228,120 @@ router.post('/updateMyInformation', verifyToken, (req, res) => {
       res.send('name不可为空')
     }
   })().catch((e) => console.error(e, 'err'))
+})
+
+// 收藏文章
+router.post('/collectionPage', verifyToken, (req, res) => {
+  ;(async () => {
+    var userId = req.body.tokenData.user._id
+    var { pageId, itisfavorites } = req.body
+    var userFindresault = await UserModel.findById(userId)
+    var myCollection = userFindresault.myCollection
+    if (itisfavorites) {
+      if (myCollection.indexOf(pageId) == -1) {
+        myCollection.push(pageId)
+        var userResalt = await UserModel.updateOne(
+          { _id: userId },
+          {
+            myCollection: myCollection,
+          }
+        )
+        var pageFindresault = await PageModel.findById(pageId)
+        var favorites = pageFindresault.favorites
+        favorites += 1
+        var pageResault = await PageModel.updateOne(
+          { _id: pageId },
+          {
+            favorites: favorites,
+          }
+        )
+      }
+    } else {
+      if (myCollection.indexOf(pageId) > -1) {
+        myCollection.splice(myCollection.indexOf(pageId), 1)
+        var userResalt = await UserModel.updateOne(
+          { _id: userId },
+          {
+            myCollection: myCollection,
+          }
+        )
+        var pageFindresault = await PageModel.findById(pageId)
+        var favorites = pageFindresault.favorites
+        favorites -= 1
+        var pageResault = await PageModel.updateOne(
+          { _id: pageId },
+          {
+            favorites: favorites,
+          }
+        )
+      }
+    }
+
+    var theuser = req.body.tokenData.user
+    var _id = userId
+    var name = theuser.name
+    var power = theuser.power
+    var user = { name, power, _id, myCollection }
+    var tokenData = { user }
+    var token = generatorToken(tokenData, effectiveDuration)
+    res.send({ token })
+  })().catch((e) => {
+    res.send('err')
+    console.error(e, 'err')
+  })
+})
+
+// 个人收藏
+router.post('/myCollection', verifyToken, (req, res) => {
+  ;(async () => {
+    var myCollection = req.body.tokenData.user.myCollection
+    var allPromises = []
+    for (let i = 0; i < myCollection.length; i++) {
+      allPromises.push(PageListModel.find({ pageId: myCollection[i] }))
+    }
+    var collection = await Promise.all(allPromises.map((p) => p.catch((err) => '')))
+    resSend = collection[0] == undefined ? [] :collection[0]
+    res.send(resSend)
+  })().catch((e) => console.error(e, 'err'))
+})
+
+// 删除收藏
+router.post('/removeMyCollection', verifyToken, (req, res) => {
+  ;(async () => {
+    var userId = req.body.tokenData.user._id
+    var { pageId } = req.body
+    var userFindresault = await UserModel.findById(userId)
+    var myCollection = userFindresault.myCollection
+    if (myCollection.indexOf(pageId) > -1) {
+      myCollection.splice(myCollection.indexOf(pageId), 1)
+      var userResalt = await UserModel.updateOne(
+        { _id: userId },
+        {
+          myCollection: myCollection,
+        }
+      )
+      var pageFindresault = await PageModel.findById(pageId)
+      var favorites = pageFindresault.favorites
+      favorites -= 1
+      var pageResault = await PageModel.updateOne(
+        { _id: pageId },
+        {
+          favorites: favorites,
+        }
+      )
+    }
+    var theuser = req.body.tokenData.user
+    var _id = userId
+    var name = theuser.name
+    var power = theuser.power
+    var user = { name, power, _id, myCollection }
+    var tokenData = { user }
+    var token = generatorToken(tokenData, effectiveDuration)
+    res.send({ token })
+  })().catch((e) => {
+    res.send('err')
+    console.error(e, 'err')
+  })
 })
 
 module.exports = router
